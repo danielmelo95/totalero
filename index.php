@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Login V3</title>
+	<title>TODO LIST</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--===============================================================================================-->	
@@ -33,13 +33,57 @@
 
 </head>
 <body>
+<?php
+	require 'php/conf/config.php';
+	$mysqli = new mysqli($servername,$username,$password,$dbname);
+	
+	// echo uniqid("");
 
+	if(isset($_POST['name_singup'])){
+
+	    $result = $mysqli->query("SELECT id FROM Users WHERE mail='".$_POST['mail_singup']."'");
+	    $res1 = $result->fetch_assoc();
+	    if(empty($res1['id'])){
+
+	    $result = $mysqli->query("INSERT INTO Users ( username,mail,passwd)
+							VALUES ('".$_POST['name_singup']."','".$_POST['mail_singup']."','".hash('sha512', $_POST['pass_singup']).uniqid()."');");
+		}
+		else {
+			echo '<script>alert("account with '.$_POST['mail_singup'].' alredy exists")</script>';
+		}
+	}
+
+	if(isset($_POST['login_mail'])){
+		echo $_POST['login_mail'];
+	    $result = $mysqli->query("SELECT mail, passwd FROM Users WHERE mail='".$_POST['login_mail']."'");
+	    $res1 = $result->fetch_assoc();
+	    echo '<br>'.$res1['mail'].'<br>';
+	    if(!empty($res1['mail'])){
+
+	   	$password = $res1['passwd'];
+	   	echo $password;
+	   	echo '<br>';
+	   	$pass_len = count($password);
+	   	echo $pass_len;
+	   	echo '<br>';
+	   	$shorten_pass = substr($password, 0, $pass_len-14);
+	   	echo $shorten_pass;
+	   	if($shorten_pass == hash('sha512', $_POST['login_pass'])){
+			echo '<script>alert("Good login")</script>';
+	   	}
+		}
+		else {
+			echo '<script>alert("Account does not exist")</script>';
+		}
+	}
+
+?>
 	<!-- <div id="particles-js" style="z-index: 2;width: 100%;height: 99%;position: absolute;top: 0;"></div> -->
 
 	<div class="limiter" style="z-index: 3">
 		<div class="container-login100" style="background-image: url('images/bg-03.jpg');">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" action="index.php">
+				<form class="login100-form validate-form" action="index.php" method="post" >
 					<span class="login100-form-logo">
 						<i class="zmdi zmdi-alarm-check"></i>
 					</span>
@@ -50,27 +94,22 @@
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Enter your name">
-						<input class="input100" type="text" name="username" placeholder="Your name">
+						<input class="input100" type="text" name="name_singup" placeholder="Your name">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter your email adress">
-						<input class="input100" type="text" name="pass" placeholder="Email">
-						<span class="focus-input100" data-placeholder="&#xf207;"></span>
-					</div>
-
-					<div class="wrap-input100 validate-input" data-validate="Enter username">
-						<input class="input100" type="text" name="pass" placeholder="Username">
+						<input class="input100" type="text" name="mail_singup" placeholder="Email">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
 					
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+						<input class="input100" type="password" name="pass_singup" placeholder="Password">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn">
+						<button class="login100-form-btn" name="singup" method="post">
 							Sign Up
 						</button> 					
 					</div>
@@ -89,6 +128,7 @@
 					</form>
 					</div>
 				';
+
 				// $_POST = array();				
 				}
 				if(isset($_POST['login_click']) || !isset($_POST['signup_click'])){					
@@ -96,13 +136,13 @@
 						Login
 					</span>
 
-					<div class="wrap-input100 validate-input" data-validate = "Enter username">
-						<input class="input100" type="text" name="username" placeholder="Username">
+					<div class="wrap-input100 validate-input" data-validate = "Enter email">
+						<input class="input100" type="text" name="login_mail" placeholder="Email">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+						<input class="input100" type="password" name="login_pass" placeholder="Password">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
 					</div>
 
@@ -136,8 +176,6 @@
 					</form>
 					</div>
 				';
-				// $_POST = array();				
-
 				}
 
 				?>
